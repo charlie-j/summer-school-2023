@@ -1,0 +1,122 @@
+(* Declaration *)
+param NA, NB, NK. (* number of agents A, number of agents B and number of public keys. *)
+
+type host [bounded].  (* hostname identifiers *)
+type keyseed [large,fixed].  (* seed for signing key generation *)
+type pkey [bounded].  (* signing public key *)
+type skey [bounded].  (* signing secret key *)
+type message [bounded]. (* the signed message space *)
+type signature [bounded]. (* the output signature space *)
+
+type G [large,bounded]. (* the finite group definition *)
+type Z [large,bounded]. (* the field of the exponents of the group *)
+type key [fixed]. (* the output of the hash function, also corresponding to the final keys space *)
+
+(* Basic Diffie-Hellman declarations *)
+expand DH_basic(G, Z, g, exp, exp', mult).
+
+(* This collision assumption is needed to prove an injective
+   correspondence, because we use ephemerals to distinguish sessions. *)
+proba PCollKey1.
+proba PCollKey2.
+
+(* DH_proba_collision says that
+   - the probability that exp(g, x) = Y for random x and Y independent of x
+   is at most PCollKey1, and
+   - the probability that exp(g, mult(x,y)) = Y where x and y are independent
+   random private keys and Y is independent of x or y is at most PCollKey2.
+*)
+expand DH_proba_collision(
+  G,        (* type of group elements *)
+  Z,        (* type of exponents *)
+  g,        (* group generator *)
+  exp,      (* exponentiation function *)
+  exp',     (* exp. func. after transformation *)
+  mult,     (* func. for exponent multiplication *)
+  PCollKey1,(*  *)
+  PCollKey2
+).
+
+(* CDH assumption *)
+proba pCDH.
+expand CDH(G, Z, g, exp, exp', mult, pCDH).
+
+
+(* Hash in the random oracle model *)
+type hashfunction [fixed].
+expand ROM_hash(
+  hashfunction, (* type for hash function choice *)
+  G,            (* type of input *)
+  key,          (* type of output *)
+  hash,         (* name of hash function *)
+  hashoracle,   (* process defining the hash oracle *)
+  qH            (* parameter: number of calls *)
+).
+
+
+(* Signatures *)
+proba Psign.
+proba Psigncoll.
+(* expand UF_CMA_det_signature( *)
+expand UF_CMA_proba_signature(
+  (* types, to be defined outside the macro *)
+  keyseed,
+  pkey,
+  skey,
+  message,
+  signature,
+  (* names for functions defined by the macro *)
+  skgen,
+  pkgen,
+  sign,
+  verify,
+  (* probabilities, to be defined outside the macro *)
+  Psign,     (* breaking the UF-CMA property *)
+  Psigncoll  (* collision between independently gen. keys *)
+).
+
+
+(* The two honest peers *)
+const A,B:host.
+
+(* TODO secrecy queries *)
+
+(* TODO event definition + authenticaiton queries*)
+
+(* TODO table definition for public key infrastructure *)
+
+let processA(hf:hashfunction, skA:skey) =
+  (* TODO. *)
+
+let processB(hf:hashfunction, skB:skey) =
+  (* TODO. *)
+
+let pki(pkA:pkey, pkB:pkey) =
+  (* TODO *) 
+
+letfun keygen() =
+  rk <-R keyseed;
+  sk <- skgen(rk);
+  pk <- pkgen(rk);
+  (sk, pk).
+
+(* final process declaration *)
+process
+  Ostart() :=
+    hf <-R hashfunction;
+    let (skA: skey, pkA: pkey) = keygen() in
+    let (skB: skey, pkB: pkey) = keygen() in
+    return(pkA, pkB);
+
+    (
+     (foreach iA <= NA do
+      run processA(hf, skA))
+     |
+     (foreach iB <= NB do
+      run processB(hf, skB))
+     |
+     (foreach iK <= NK do
+      run pki(pkA, pkB))
+     |
+      run hashoracle(hf)
+    )
