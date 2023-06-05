@@ -72,8 +72,8 @@ process OracleDeclaration
 (* table declaration *)
 table tablename(valuetype1,...,valuetypen).
 (* OracleContent for tables *)
-   insert tablename(value1,...,valuen).
-   get keys(t1,...,tn).  (* here t1 is either a variable `x`, or a `=t` with t a value used to select specific entries from the table *)
+   insert tablename(value1,...,valuen)
+   get keys(t1,...,tn)  (* here t1 is either a variable `x`, or a `=t` with t a value used to select specific entries from the table *)
 
 (*** FUNCTION MACROS ***)
 
