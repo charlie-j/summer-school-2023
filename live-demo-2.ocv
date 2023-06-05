@@ -1,0 +1,35 @@
+(* This file contain an excerpt of the crypto builtin library, with the IND-CPA definition that can be expanded in your own files. *)
+(* see live-demo-3.ocv for the details usage *)
+
+def IND_CPA_sym_enc_all_args(key, cleartext, ciphertext, enc_seed, enc, enc_r, enc_r', dec, injbot, Z, Penc) { 
+
+param N.
+
+fun enc_r(cleartext, key, enc_seed): ciphertext.
+fun dec(ciphertext, key): bitstringbot.
+
+fun enc_r'(cleartext, key, enc_seed): ciphertext.
+
+fun injbot(cleartext):bitstringbot [data].
+(* The function Z returns for each bitstring, a bitstring
+   of the same length, consisting only of zeroes. *)
+fun Z(cleartext):cleartext.
+
+(* The encryption function is probabilistic *)
+letfun enc(m: cleartext, k: key) =
+       r <-R enc_seed; enc_r(m, k, r).
+
+equation forall x:cleartext; injbot(x) <> bottom.
+equation forall m:cleartext, k:key, r:enc_seed; 
+	dec(enc_r(m, k, r), k) = injbot(m).
+
+equiv(ind_cpa(enc))
+       k <-R key; 
+       	       foreach i <= N do r <-R enc_seed; Oenc(x:cleartext) := 
+	       	       return(enc_r(x, k, r)) 
+     <=(Penc(time, N, maxlength(x)))=> 
+       k <-R key; 
+       	       foreach i <= N do r <-R enc_seed; Oenc(x:cleartext) := 
+	       	       return(enc_r'(Z(x), k, r)).
+
+}

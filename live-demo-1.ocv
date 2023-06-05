@@ -1,0 +1,34 @@
+(* This file models a cryptoverif file where one defines the two oracles for IND-CPA encryption, and tries to prove it. *)
+(* Of course, no proof is possible, because we do not make any assumption on the enc function symbol and only declare it. *)
+
+type key [fixed].  
+
+type enc_seed [bounded].
+
+fun enc_r(bitstring,key,enc_seed):bitstring.
+
+fun len(bitstring):bitstring.
+
+let QencL(k: key, r: enc_seed) = 
+	Oenc (m1: bitstring, m2: bitstring) :=
+	if len(m1) = len(m2) then (* m1 and m2 have the same length *)
+		return(enc_r(m1,k,r)).
+
+let QencR(k: key, r: enc_seed) = 
+	Oenc (m1: bitstring, m2: bitstring) :=
+	if len(m1) = len(m2) then (* m1 and m2 have the same length *)
+		return(enc_r(m2,k,r)).
+
+
+equivalence
+    Ostart () :=
+	k <-R key;
+	r <-R enc_seed;
+	return;
+ 	run QencL(k, r)
+
+    Ostart () :=
+	k <-R key;
+	r <-R enc_seed;
+	return;
+ 	run QencR(k, r)

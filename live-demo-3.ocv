@@ -1,0 +1,38 @@
+(* This file uses the builtin ind-cpa assumption to prove a variant of the ind-cpa assumption. *)
+(* CryptoVerif should succeed. *)
+
+type key [fixed].  
+
+type enc_seed [bounded].
+
+proba Penc.
+
+expand IND_CPA_sym_enc_all_args(key,
+bitstring,
+bitstring,
+enc_seed,
+enc,
+enc_r,
+enc_r',
+dec,
+injbot,
+Z,
+Penc).
+
+query secret b.
+
+let QencLR(b0: bool, k: key, r: enc_seed) = 
+	Oenc (m1: bitstring, m2: bitstring) :=
+	if Z(m1) = Z(m2) then (* m1 and m2 have the same length *)
+	if b0 then 
+		return(enc_r(m1,k,r))
+	else
+		return(enc_r(m2,k,r)).
+
+process Ostart () :=
+        b <-R bool;
+	k <-R key;
+	r <-R enc_seed;
+	return;
+ 	run QencLR(b, k, r)
+
