@@ -4,35 +4,35 @@
 (*************************************************)
 (*************************************************)
 
-(* Declaring a parameter name - used e.g. to talk about the number of session *)
+(* Declaring a parameter name - used, e.g., to talk about the number of sessions (the number of times an oracle can be called by the adversary) *)
 param myCoolParam.
 
 (* Declaring a type *)
-type key [fixed]. (* a set of bitstring of a fixed length (implicitly depends on the security parameter) *)
+type key [fixed]. (* a set of bitstring of a fixed length *)
 
 type message [bounded]. (* any finite set of bitstring *)
 
 (* Fixed constant declaration *)
 const constname:consttype.
 
-(* Define a probability name - used e.g. to talk about the proba of breaking ind-cpa *)
+(* Define a probability name - used, e.g., to talk about the proba of breaking an assumption like IND-CPA *)
 proba myCoolProba.
 
 (* Expand the IND_CPA definition  - see cryptolib/commonlib.cvl for their full code *)
 expand IND_CPA_sym_enc(key, bitstring, bitstring, enc, dec, injbot, Z, myCoolProba).
 expand SUF_CMA_det_mac(mkey, bitstring, macs, mac, verify, myOtherCoolProba).
-(* Most parameters of an expand start with some types, that need to be predeclared, followed by a few function names that will be declared by the expand, ending with a few probability names that are previously defined. Additional parameter may contain process names declared whitin the expand or parameter names also declared inside. *)
+(* Most parameters of an expand start with the names of some types that need to be declared prior to the macro expansion, followed by a few function names that will be declared by the expand, ending with a few probability names that need to be previously defined. Additional parameters may contain process names declared within the expand, or parameter names also declared inside. *)
 
 (* function declaration - for those not defined through an expand *)
-fun coolfunction(type1,...,typen) : outputtype.
-fun encodingfunction(type1,...,typen) : outputtype [data]. (* functions annotated with data have an easily computable inverse. *) 
+fun coolfunction(type1, ..., typen) : outputtype.
+fun encodingfunction(type1, ..., typen) : outputtype [data]. (* functions annotated with data are injective and have an efficiently computable inverse. *) 
 
-(* Secrecy queries, b must be sampled whitin the model with the same name *)
+(* Secrecy queries, b must be a variable within the model *)
 query secret b.
 
 (* Declare an event and query whether it never occurs *)
 event someBadEvent.
-query event(someBadEvent) ==> false. (* if someBadEvent => false is true, it means that this bad event never occurs in any execution *)
+query event(someBadEvent) ==> false. (* if someBadEvent ==> false is true, it means that this bad event never occurs in any execution *)
 
 
 (*************************************************)
@@ -42,17 +42,17 @@ query event(someBadEvent) ==> false. (* if someBadEvent => false is true, it mea
 (*************************************************)
 
 (* Oracle Declaration are either *)
- Oracle(arg1 : type1,...) := OracleContent
- foreach i<= myCooolParam do OracleDeclaration (* replication *)
+ Oracle(arg1 : type1, ...) := OracleContent
+ foreach i <= myCoolParam do OracleDeclaration (* replication *)
  OracleDeclaration1 | OracleDeclaration2 (* parallel execution *)
 
 (* OracleContents are either *)
   if cond then OracleContentThen else OracleContentElse
   var <-R type; OracleContent  (* sample inside a type then continue *)
   var <- value; OracleContent (* assign a value *)
-  return(v1,...,vn); OracleDeclaration (* conclude the oracle call, and return value *)
-  run MyCoolProcess(v1,...,vn) (* execute a macro - see below for a macro declartion*)
-  event myEvent(v1,...,vn); OracleDeclaration
+  return(v1, ..., vn); OracleDeclaration (* conclude the oracle call, and return value *)
+  run MyCoolProcess(v1, ..., vn) (* execute a macro - see below for a macro declaration *)
+  event myEvent(v1, ..., vn); OracleDeclaration
 
 (* Declare a macro process *)
 let MyCoolProcess(arg1 : type1, ...) =
@@ -63,52 +63,49 @@ process OracleDeclaration
 
 (*************************************************)
 (*************************************************)
-(****          ADVANCED COSNTRUCTS            ****)
+(****          ADVANCED CONSTRUCTS            ****)
 (*************************************************)
 (*************************************************)
 
 (**** TABLES ****)
 
 (* table declaration *)
-table tablename(valuetype1,...,valuetypen).
+table tablename(valuetype1, ..., valuetypen).
 (* OracleContent for tables *)
-   insert tablename(value1,...,valuen)
-   get keys(t1,...,tn)  (* here t1 is either a variable `x`, or a `=t` with t a value used to select specific entries from the table *)
+   insert tablename(value1, ..., valuen)
+   get keys(t1, ..., tn)  (* here, t1 is either a variable `x`, or a `=t` with t a value used to select specific entries from the table *)
 
 (*** FUNCTION MACROS ***)
 
 (* function macro definition *)
-letfun funmacro(v1:type1,...,vm:typen) =
+letfun funmacro(v1:type1, ..., vm:typen) =
    ...
    Conditionals or samplings or assignements or events
    ...
    final_return_value.
 
 (* let binding command in OracleContent *)
-(* variables can also be bound to value whitin a let binding, which also allow to easily capture the return value of a function macro through pattern matching *)
-   let (v1: type1,..., vn : typen) = t in OracleContent (* t must be a tuple of the correct length *)
+(* variables can also be bound to a value within a let binding, which also allows to easily capture, through pattern matching, the return value of a function macro, or the inverse of a function declared [data] *)
+   let (v1: type1, ..., vn : typen) = t in OracleContent (* t must be a tuple of the correct length *)
 
 (*** FIND  ***)
 
-(* Assigning a value to a variable x under a replication i,...,k implicitly defines a globally accessible array x[i,...,k]. Such arrays can be searched over with the following construct, where it is possible to know whether a given cell of the array has been defined and perform arbitrary tests. *)
+(* Assigning a value to a variable x under a replication i, ..., k implicitly defines a globally accessible array x[i, ..., k]. Such arrays can be searched over with the following construct, where it is possible to know whether a given cell of the array has been defined and perform arbitrary tests. *)
   find i <= indexParam suchthat defined(x[i]) && Condition then OracleContent else OracleContentElse
 
-(*** QUERIES *)
+(*** CORRESPONDENCE QUERIES *)
 
-(* Events with parameters and complex queries*)
-event beginEvent(type1,...,typen).
-event endEvent(type1,...,typem). 
-query v1:type1,...,vn:typen; event(endEvent(t1,...,tm)) ==> event(beginEvent(t1,...,tk)). (* test if in any execution, whenever endEvent occured with some parameters, a matching beginEvent occured before.  The event parameters should be value built over constants and the variables v1...vn*)
-query v1:type1,...,vn:typen; inj-event(endEvent(v1,...,vn)) ==> inj-event(beginEvent(v1,...,vm)). (* test if in any execution, whenever endEvent occured with some parameters, there is precisely a single matching beginEvent that occured before. *)
+(* Events with parameters and complex queries *)
+event beginEvent(type1, ..., typen).
+event endEvent(type1, ..., typem).
+
+query v1:type1, ..., vn:typen; event(endEvent(t1, ..., tm)) ==> event(beginEvent(t1, ..., tk)). (* test if in any execution, whenever endEvent occured with some parameters, a matching beginEvent occured before.  The event parameters should be values built over constants and the variables v1, ..., vn *)
+
+query v1:type1, ..., vn:typen; inj-event(endEvent(v1, ..., vn)) ==> inj-event(beginEvent(v1, ..., vm)). (* test if in any execution, whenever endEvent occured with some parameters, there is precisely a single matching beginEvent that occured before. *)
 
 (*** FUNCTIONS ***)
 
 (* Equation declaration *)
-equation forall v1:type1, ..., vn:typeblocksize; t1 = t2 .
-
-
-
-  
-  
-
+equation forall v1:type1, ..., vn:typen; t1 = t2.
+equation forall v1:type1, ..., vn:typen; t1 <> t2.
 

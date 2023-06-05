@@ -1,0 +1,47 @@
+(* this files does not auto proves, as the merge branch does not work above the oracle declaration. *)
+
+type key [fixed].
+
+type enc_seed [bounded].
+
+proba Penc.
+
+expand IND_CPA_sym_enc_all_args(key, bitstring, bitstring, enc_seed, enc, enc_r, enc_r', dec, injbot, Z, Penc).
+
+query secret b.
+
+let QencL(k: key, r: enc_seed) = 
+	Oenc (m1: bitstring, m2: bitstring) :=
+	if Z(m1) = Z(m2) then (* m1 and m2 have the same length *)
+		return(enc_r(m1,k,r)).
+
+let QencR(k: key, r: enc_seed) = 
+	Oenc (m1: bitstring, m2: bitstring) :=
+	if Z(m1) = Z(m2) then (* m1 and m2 have the same length *)
+		return(enc_r(m2,k,r)).
+
+(* The following allows to play interactively within cryptoverif on a proof. Type help after launching cryptoverif ! *)
+proof { interactive }
+
+
+(* Alternatively, one can store a proof by hand, you can replay the stored proof by first commenting out the previous proof statement. *)
+(*
+proof{
+auto;
+show_game occ;
+replace 39 "Z(m1_1)";
+merge_branches;
+auto
+}
+*) 
+
+process Ostart () :=
+	b <-R bool;
+	k <-R key;
+	r <-R enc_seed;
+	if b then
+	   return;	
+	   run QencL(k, r)
+        else
+	   return;
+	   run QencR(k, r)

@@ -81,7 +81,7 @@ const A,B:host.
 
 (* TODO secrecy queries *)
 
-(* TODO event definition + authenticaiton queries*)
+(* TODO event definition + authentication queries *)
 
 (* TODO table definition for public key infrastructure *)
 
