@@ -18,14 +18,13 @@ const constname:consttype.
 (* Define a probability name - used, e.g., to talk about the proba of breaking an assumption like IND-CPA *)
 proba myCoolProba.
 
-(* Expand the IND_CPA definition  - see default.ocvl for their full code *)
+(* Expand the IND_CPA definition  - see newdefault.ocv for their full code *)
 expand IND_CPA_sym_enc(key, bitstring, bitstring, enc, dec, injbot, Z, myCoolProba).
 expand SUF_CMA_det_mac(mkey, bitstring, macs, mac, verify, myOtherCoolProba).
 (* Most parameters of an expand start with the names of some types that need to be declared prior to the macro expansion, followed by a few function names that will be declared by the expand, ending with a few probability names that need to be previously defined. Additional parameters may contain process names declared within the expand, or parameter names also declared inside. *)
 
 (* function declaration - for those not defined through an expand *)
 fun coolfunction(type1, ..., typen) : outputtype.
-fun encodingfunction(type1, ..., typen) : outputtype [data]. (* functions annotated with data are injective and have an efficiently computable inverse. *) 
 
 (* Secrecy queries, b must be a variable within the model *)
 query secret b.
@@ -72,8 +71,8 @@ process OracleDeclaration
 (* table declaration *)
 table tablename(valuetype1, ..., valuetypen).
 (* OracleContent for tables *)
-   insert tablename(value1, ..., valuen)
-   get tablename(t1, ..., tn)  (* here, t1 is either a variable `x`, or a `=t` with t a value used to select specific entries from the table *)
+   insert tablename(value1, ..., valuen);
+   get keys(t1, ..., tn) in  (* here, t1 is either a variable `x`, or a `=t` with t a value used to select specific entries from the table. *)
 
 (*** FUNCTION MACROS ***)
 
@@ -86,7 +85,10 @@ letfun funmacro(v1:type1, ..., vm:typen) =
 
 (* let binding command in OracleContent *)
 (* variables can also be bound to a value within a let binding, which also allows to easily capture, through pattern matching, the return value of a function macro, or the inverse of a function declared [data] *)
-   let (v1: type1, ..., vn : typen) = t in OracleContent (* t must be a tuple of the correct length *)
+
+fun encodingfunction(type1, ..., typen) : outputtype [data]. (* functions annotated with data are injective and have an efficiently computable inverse. *) 
+
+let encodingfunction(v1, ..., vn) = t in OracleContent (* this will only work if the t received does contain a message obtained by using the encodingfunction result. *)
 
 (*** FIND  ***)
 
