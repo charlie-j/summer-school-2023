@@ -18,7 +18,7 @@ const constname:consttype.
 (* Define a probability name - used, e.g., to talk about the proba of breaking an assumption like IND-CPA *)
 proba myCoolProba.
 
-(* Expand the IND_CPA definition  - see cryptolib/commonlib.cvl for their full code *)
+(* Expand the IND_CPA definition  - see default.ocvl for their full code *)
 expand IND_CPA_sym_enc(key, bitstring, bitstring, enc, dec, injbot, Z, myCoolProba).
 expand SUF_CMA_det_mac(mkey, bitstring, macs, mac, verify, myOtherCoolProba).
 (* Most parameters of an expand start with the names of some types that need to be declared prior to the macro expansion, followed by a few function names that will be declared by the expand, ending with a few probability names that need to be previously defined. Additional parameters may contain process names declared within the expand, or parameter names also declared inside. *)
