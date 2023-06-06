@@ -86,14 +86,17 @@ const A,B:host.
 (* TODO table definition for public key infrastructure *)
 
 let processA(hf:hashfunction, skA:skey) =
+   SomeOracleTODO () := return.
   (* TODO. *)
 
 let processB(hf:hashfunction, skB:skey) =
+   SomeOtherOracleTODO () := return.
   (* TODO. *)
 
 let pki(pkA:pkey, pkB:pkey) =
   (* TODO *) 
-
+   SomeOtherOtherOracleTODO () := return.
+   
 letfun keygen() =
   rk <-R keyseed;
   sk <- skgen(rk);
