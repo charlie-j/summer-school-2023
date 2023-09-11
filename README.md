@@ -4,7 +4,7 @@ CryptoVerif installations instructions can be found in [INSTALLATION.md](INSTALL
 
 While this tutorial was designed as a live experience, some material can still be of use for people wishing to learn more about CryptoVerif. The slides may not always be standalone, but for people knowladgeable about crypto, it should still allow to discover CryptoVerif. Feedback is welcome.
 
-The tutorial starts with [slides-morning.pdf](slides-morning.pdf), where a few files are used as demos: [live-demo-1.ocv](live-demo-1.ocv),  [live-demo-2.ocv](live-demo-2.ocv),  [live-demo-2.ocv](live-demo-2.ocv). This tutorial introduces basic cryptographic notions (indistinguishability, IND-CPA, SUF-CMA, proofs by reductions, the few basic syntaxix constructions of CryptoVerif and a first small proof in CryptoVerif of the equivalence of two IND-CPA variant.
+The tutorial starts with [slides-morning.pdf](slides-morning.pdf), where a few files are used as demos: [live-demo-1.ocv](live-demo-1.ocv),  [live-demo-2.ocv](live-demo-2.ocv),  [live-demo-3.ocv](live-demo-3.ocv). This tutorial introduces basic cryptographic notions (indistinguishability, IND-CPA, SUF-CMA, proofs by reductions, the few basic syntaxix constructions of CryptoVerif and a first small proof in CryptoVerif of the equivalence of two IND-CPA variant.
 
 After the morning tutorial, the first practical session sheet is [instructions-practical-session-1.pdf](instructions-practical-session-1.pdf), trying to prove the security of an ENC-then-MAC construction. To help with the basic syntax of CryptoVerif, a [cheatsheet.ocv](cheatsheet.ocv) is provided. Correction files are also available (see the files prefixed with `corr-enc-then-MAC)`, but only open them after really trying !).
 
